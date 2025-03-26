@@ -499,6 +499,8 @@ def fetch_WAC(muni, state, year):
     
     # clip to muni
     muni_blocks = gpd.clip(state_blocks, muni_gdf)
+    # add municipality column
+    muni_blocks['municipality'] = muni.upper()
 
     # export to geopackage
     muni_blocks.to_file(f"WAC_{muni}.gpkg", driver='GPKG')

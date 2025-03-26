@@ -351,9 +351,8 @@ def fetch_WAC(muni, state, year):
 
     file_url = f"{base_url}{state}_wac_S000_JT00_{year}.csv.gz"
     try:
-        df = pd.read_csv(file_url, compression='gzip')
+        main_df = pd.read_csv(file_url, compression='gzip')
         print(f"Fetched main dataset for {state}, year {year}.")
-        return df
     except Exception as e:
         print(f"Failed to fetch WAC dataset for {state} in {year}: {e}")
         return None

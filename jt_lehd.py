@@ -7,7 +7,7 @@ import json
 import os
 
 def get_fips(state):
-    with open('fips_dict.json', 'r') as f:
+    with open('jt_census/fips_dict.json', 'r') as f:
         fips_dict = json.load(f)
 
     state_usps, state_name, state_fips, counties = None, None, None, None
@@ -40,7 +40,7 @@ def get_blocks(year, states):
     year = int(year)
 
     # Load the FIPS dictionary from 'fips_dict.json' file
-    with open('fips_dict.json', 'r') as f:
+    with open('jt_census/fips_dict.json', 'r') as f:
         fips_dict = json.load(f)
 
     # Define the URL and GEOID header based on the year

@@ -2,6 +2,7 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 import requests
+import re
 import json
 import os
 
@@ -322,18 +323,40 @@ def fetch_WAC(muni, state, year):
         print("State not found. Please make sure to use a valid 2-letter state abbreviation.")
         return None
 
-    # Check for valid year
-    if year not in valid_years:
-        print("Year not found. Please make sure to use YYYY, and note that data is available only from 2003 to 2021.")
-        return None
+    base_url = f"https://lehd.ces.census.gov/data/lodes/LODES8/{state}/wac/"
     
-    # Fetch WAC dataset for input state
-    main_url = fr"https://lehd.ces.census.gov/data/lodes/LODES8/{state}/wac/{state}_wac_S000_JT00_{year}.csv.gz"
     try:
-        main_df = pd.read_csv(main_url, compression='gzip')
-        print(f"Fetched main dataset for {state}.")
+        html = requests.get(base_url).text
     except Exception as e:
-        print(f"Failed to fetch main dataset for {state}: {e}")
+        print(f"Failed to access WAC directory for {state}: {e}")
+        return None
+
+    # Extract all valid years from filenames
+    matches = re.findall(fr"{state}_wac_S000_JT00_(\d{{4}}).csv.gz", html)
+    if not matches:
+        print("No WAC files found for this state.")
+        return None
+
+    available_years = sorted(set(int(m) for m in matches))
+    latest_year = available_years[-1]
+
+    if year == "latest":
+        year = latest_year
+    elif isinstance(year, int) and year > latest_year:
+        print(f"Latest year available is {latest_year}. Fetching that.")
+        year = latest_year
+    elif isinstance(year, int) and year not in available_years:
+        print(f"Year {year} not available for {state}. Available years: {available_years}")
+        return None
+
+    file_url = f"{base_url}{state}_wac_S000_JT00_{year}.csv.gz"
+    try:
+        df = pd.read_csv(file_url, compression='gzip')
+        print(f"Fetched main dataset for {state}, year {year}.")
+        return df
+    except Exception as e:
+        print(f"Failed to fetch WAC dataset for {state} in {year}: {e}")
+        return None
     
     WAC_variables = {
         "Variable": [

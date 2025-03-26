@@ -182,6 +182,8 @@ def get_dec(year, state, county, var_group, apikey):
     for key, value in counties.items():
         if county.lower() in key.lower():
             county_fips = value
+        elif county == "all":
+            county_fips = "*"
             break
 
     if county_fips is None:

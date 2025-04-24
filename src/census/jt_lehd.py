@@ -7,37 +7,8 @@ import json
 import os
 
 # Import the canonical version of get_fips from jt_census.py
-from jt_census import get_fips
+from src.census.jt_census import get_fips
 
-
-def get_fips(state):
-    with open('jt_census/fips_dict.json', 'r') as f:
-        fips_dict = json.load(f)
-
-    state_usps, state_name, state_fips, counties = None, None, None, None
-
-    if len(state) == 2:
-        state = state.upper()
-        if state in fips_dict:
-            state_usps = state
-            state_fips = fips_dict[state]['state_fips']
-            state_name = fips_dict[state]['state_name']
-            counties = fips_dict[state]['counties']
-        else:
-            raise ValueError(f"USPS code '{state}' not found in FIPS dictionary...")
-    else:
-        for key in fips_dict:
-            if fips_dict[key]['state_name'].lower() == state.lower():
-                state_usps = key
-                state_fips = fips_dict[key]['state_fips']
-                state_name = fips_dict[key]['state_name']
-                counties = fips_dict[key]['counties']
-                break
-
-    if state_usps is None or state_name is None or state_fips is None or counties is None:
-        raise ValueError(f"Invalid state input; please check the spelling or use the USPS 2-char abbreviation (e.g., MA).")
-
-    return state_usps, state_name, state_fips, counties
 
 def get_blocks(year, states):
     # Convert year to integer for comparison

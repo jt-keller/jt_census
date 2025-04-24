@@ -6,6 +6,10 @@ import re
 import json
 import os
 
+# Import the canonical version of get_fips from jt_census.py
+from jt_census import get_fips
+
+
 def get_fips(state):
     with open('jt_census/fips_dict.json', 'r') as f:
         fips_dict = json.load(f)

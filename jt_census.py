@@ -74,20 +74,23 @@ def vars_acs(year, return_type="short"):
 
 
 
+
 def get_fips(state):
-    with open('fips_dict.json', 'r') as f:
+    # Safely resolve path relative to this script
+    fips_path = os.path.join(os.path.dirname(__file__), "fips_dict.json")
+    with open(fips_path, 'r') as f:
         fips_dict = json.load(f)
 
     state_usps, state_name, state_fips, counties = None, None, None, None
 
+    # Normalize to uppercase if it's a 2-letter USPS code
     if len(state) == 2:
+        state = state.upper()
         if state in fips_dict:
             state_usps = state
             state_fips = fips_dict[state]['state_fips']
             state_name = fips_dict[state]['state_name']
             counties = fips_dict[state]['counties']
-        else:
-            raise ValueError(f"USPS code '{state}' not found in FIPS dictionary...")
     else:
         for key in fips_dict:
             if fips_dict[key]['state_name'].lower() == state.lower():
@@ -97,10 +100,11 @@ def get_fips(state):
                 counties = fips_dict[key]['counties']
                 break
 
-    if state_usps is None or state_name is None or state_fips is None or counties is None:
-        raise ValueError(f"Invalid state input; please check the spelling or use the USPS 2-char abbreviation (e.g., MA).")
+    if None in [state_usps, state_name, state_fips, counties]:
+        raise ValueError(f"Invalid state input: '{state}'. Use full name or 2-letter USPS code.")
 
     return state_usps, state_name, state_fips, counties
+
 
 
 def get_tig(year, state, units='block'):
